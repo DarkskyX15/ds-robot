@@ -45,7 +45,7 @@
 | `software/src/model/kinematics.py` | placo FK/IK（含正则项），采集时做 EE 转换 |
 | `software/src/robots/so100_follower/robot_kinematic_processor.py` | `EEReferenceAndDelta` / `InverseKinematicsEEToJoints` 等处理器 |
 | `software/src/cameras/opencv/camera_opencv.py`、`realsense/camera_realsense.py` | 延迟补丁：`async_read` 直接取最新帧（对应 HF lerobot PR #2695） |
-| `software/src/robots/xlerobot/xlerobot.py`、`config_xlerobot.py` | 改造驱动：`bus_left_base`（左臂+底盘）/ `bus_right_head`（右臂+头 `head_pan`/`head_tilt`）；udev 串口名；相机 `head`(RealSense)/`left_wrist`/`right_wrist`(OpenCV MJPG)；`use_degrees=True` |
+| `software/src/robots/xlerobot/xlerobot.py`、`config_xlerobot.py` | 改造驱动（本仓库已适配出厂接线：`bus1`=左臂+头、`bus2`=右臂+底盘，头部 `head_motor_1/2`，端口字段 `port1/port2`）；udev 串口名；相机 `head`(RealSense)/`left_wrist`/`right_wrist`(OpenCV MJPG)；`use_degrees=True` |
 | `software/examples/8_vr_teleop_with_dataset_recording_dualarm.py` | 双臂 VR 采集（依赖 `XLeVR` 与上述处理器） |
 | `software/src/record.py` | lerobot 0.4 兼容（`init_rerun`） |
 
@@ -69,7 +69,7 @@
 
 ### 6. 风险与注意事项
 
-1. **接线差异**：fork 驱动将总线重命名为 `bus_left_base` / `bus_right_head`，与上游布线（bus1=左臂+头，bus2=右臂+底盘）不同。沿用上游接线时需把示例中的 bus 名改回 `bus1`/`bus2`。
+1. ~~**接线差异**~~ ✅ **已解决（2026-10-16）**：原 fork 驱动（来自 xuweiwu `pi05_dual_arm`）的总线分组与出厂接线相反；现已按 `openspec/changes/align-xlerobot-bus-wiring` 适配为 `bus1`=左臂+头、`bus2`=右臂+底盘（头部电机改名 `head_motor_1/2`，配置字段 `port1`/`port2`）。真机验证见 `pi05_deployment_runbook.md`。
 2. **观测契约**：相机键（`head`/`left_wrist`/`right_wrist`）、`state` 顺序（`FULL_START_POS` 顺序）、角度单位（`use_degrees=True`）必须与训练数据一致，否则策略失效。
 3. **服务端缺口**：需自定义 openpi policy config 与 norm stats；`biso101 training_support` 分支需向 fork 作者确认或自行复现。
 4. **端口/网络**：机器人↔GPU 机需可达 TCP 8000（openpi）或 8080（LeRobot async）。

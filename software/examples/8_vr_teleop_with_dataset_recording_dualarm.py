@@ -166,9 +166,9 @@ class SimpleTeleopArm:
         
         # 1) Read current joint positions (calibrated if provided)
         if self.prefix=="left":
-            obs_raw = robot.bus_left_base.sync_read("Present_Position", robot.left_arm_motors)
+            obs_raw = robot.bus1.sync_read("Present_Position", robot.left_arm_motors)
         else:
-            obs_raw = robot.bus_right_head.sync_read("Present_Position", robot.right_arm_motors)
+            obs_raw = robot.bus2.sync_read("Present_Position", robot.right_arm_motors)
         obs = {j: obs_raw[f"{self.joint_map[j]}"] for j in self.joint_map}
 
         # 2) choose names in the order of home_positions, filter to those present in obs
@@ -227,9 +227,9 @@ class SimpleTeleopArm:
         for k_step in range(len(t)):
             
             if self.prefix=="left":
-                obs_raw = robot.bus_left_base.sync_read("Present_Position", robot.left_arm_motors)
+                obs_raw = robot.bus1.sync_read("Present_Position", robot.left_arm_motors)
             else:
-                obs_raw = robot.bus_right_head.sync_read("Present_Position", robot.right_arm_motors)
+                obs_raw = robot.bus2.sync_read("Present_Position", robot.right_arm_motors)
             obs = {j: obs_raw[f"{self.joint_map[j]}"] for j in self.joint_map}
 
             q_meas = np.array([float(obs[n]) for n in names], dtype=float)
@@ -287,9 +287,9 @@ class SimpleTeleopArm:
                 return
         
         if self.prefix == "left":
-            obs_raw = robot.bus_left_base.sync_read("Present_Position", robot.left_arm_motors)
+            obs_raw = robot.bus1.sync_read("Present_Position", robot.left_arm_motors)
         else:
-            obs_raw = robot.bus_right_head.sync_read("Present_Position", robot.right_arm_motors)
+            obs_raw = robot.bus2.sync_read("Present_Position", robot.right_arm_motors)
         current_obs = {f"{j}.pos": obs_raw[f"{self.joint_map[j]}"] for j in self.joint_map}
         
         if mode_val == ControlMode.RESET.value:
@@ -403,9 +403,9 @@ class SimpleTeleopArm:
     
     def p_control_action(self, robot):
         if self.prefix=="left":
-            obs_raw = robot.bus_left_base.sync_read("Present_Position", robot.left_arm_motors)
+            obs_raw = robot.bus1.sync_read("Present_Position", robot.left_arm_motors)
         else:
-            obs_raw = robot.bus_right_head.sync_read("Present_Position", robot.right_arm_motors)
+            obs_raw = robot.bus2.sync_read("Present_Position", robot.right_arm_motors)
 
         obs_pos_suffix = {}
         obs_no_prefix = {}
@@ -453,8 +453,8 @@ class JointIpol:
             self.ctrl_freq = ctrl_freq
             
             # 1) Read current joint positions
-            left_obs = robot.bus_left_base.sync_read("Present_Position", robot.left_arm_motors)
-            right_obs = robot.bus_right_head.sync_read("Present_Position", robot.right_arm_motors)
+            left_obs = robot.bus1.sync_read("Present_Position", robot.left_arm_motors)
+            right_obs = robot.bus2.sync_read("Present_Position", robot.right_arm_motors)
             obs = {**left_obs, **right_obs}
             print(f"current pos: {obs}")
 
@@ -509,8 +509,8 @@ class JointIpol:
         if self.ipol_path is None:
             return {}
         
-        left_obs = robot.bus_left_base.sync_read("Present_Position", robot.left_arm_motors)
-        right_obs = robot.bus_right_head.sync_read("Present_Position", robot.right_arm_motors)
+        left_obs = robot.bus1.sync_read("Present_Position", robot.left_arm_motors)
+        right_obs = robot.bus2.sync_read("Present_Position", robot.right_arm_motors)
         obs = {**left_obs, **right_obs}
 
         q_meas = np.array([float(obs[n]) for n in self.joint_names], dtype=float)
@@ -615,8 +615,8 @@ def main():
         print(f"[INIT] Successfully connected to robot")
         if robot.is_calibrated:
             print(f"[INIT] Robot is calibrated and ready to use!")
-            print(f"[INIT] Motor bus_left_base info: {robot.bus_left_base.motors}")
-            print(f"[INIT] Motor bus_right_head info: {robot.bus_right_head.motors}")
+            print(f"[INIT] Motor bus1 info: {robot.bus1.motors}")
+            print(f"[INIT] Motor bus2 info: {robot.bus2.motors}")
         else:
             print(f"[INIT] Robot requires calibration")
 

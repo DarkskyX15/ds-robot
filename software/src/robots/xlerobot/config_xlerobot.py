@@ -70,8 +70,8 @@ def xlerobot_cameras_config() -> dict[str, CameraConfig]:
 @dataclass
 class XLerobotConfig(RobotConfig):
     
-    port_right_head: str = "/dev/xlerobot_right_head"  # port to connect to the bus (so101 + head camera)
-    port_left_base: str = "/dev/xlerobot_left_base"  # port to connect to the bus (same as lekiwi setup)
+    port1: str = "/dev/xlerobot_port1"  # bus 1: left arm + head (shipped wiring, udev symlink)
+    port2: str = "/dev/xlerobot_port2"  # bus 2: right arm + base (shipped wiring, udev symlink)
     disable_torque_on_disconnect: bool = True
 
     # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.
