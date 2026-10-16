@@ -116,7 +116,7 @@ cp    software/src/cameras/realsense/camera_realsense.py "$L/cameras/realsense/"
 `software/examples/9_pi05_inference_dualarm.py`：
 
 3. `OPENPI_SERVER_IP = "10.10.64.57"`
-4. 第 398 行 `port=8000` → `port=20721`（硬编码，无配置项）
+4. `OPENPI_SERVER_PORT = 20721`（模块常量；openpi 官方默认是 8000，本部署用 20721）
 
 ### 2.4 总线接线（已适配出厂接线，2026-10-16）
 
@@ -145,7 +145,7 @@ EOF
 ### 2.6 校准 + 运行
 
 - 若机器人已有卖家格式校准文件（`~/.cache/huggingface/lerobot/calibration/`），接线适配完成后可直接复用；否则先做一次校准。
-- 运行（值守 `^` 急停）：
+- 运行（桌面会话值守 `^` 急停；**SSH 无 DISPLAY 时打印键盘不可用警告、`^` 失效，改用 `Ctrl+C` 停止**——自动回位+断开，早期测试请备好物理断电）：
 
 ```bash
 python software/examples/9_pi05_inference_dualarm.py

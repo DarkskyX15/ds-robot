@@ -40,7 +40,7 @@
 
 | 文件 | 作用 / 关键点 |
 |---|---|
-| `software/examples/9_pi05_inference_dualarm.py` | **远程推理客户端**。`:69` `OPENPI_SERVER_IP`；`:398` `WebsocketClientPolicy(host, port=8000)`；`:426-438` 观测组装（`image/head`、`image/left_wrist`、`image/right_wrist` 缩放到 224² + 12 维 `state` + `prompt`）；`:442` `client.infer()["actions"]`；`:444-467` `action_horizon=50`、`FPS=50`、P 控制 kp=0.75 执行；`:416-419` 键盘 `^` 急停；episode 间用插值回 `FULL_START_POS`（`:50-63`） |
+| `software/examples/9_pi05_inference_dualarm.py` | **远程推理客户端**。常量 `OPENPI_SERVER_IP` / `OPENPI_SERVER_PORT`（默认 20721）；`:426-438` 观测组装（`image/head`、`image/left_wrist`、`image/right_wrist` 缩放到 224² + 12 维 `state` + `prompt`）；`:442` `client.infer()["actions"]`；`:444-467` `action_horizon=50`、`FPS=50`、P 控制 kp=0.75 执行；键盘 `^` 急停（无键盘/SSH 时降级：打印警告、`Ctrl+C` 停止）；episode 间用插值回 `FULL_START_POS`（`:50-63`） |
 | `software/src/utils/quadratic_spline_via_ipol.py` | 二次样条关节插值器（限速/限加速度、`scale_to_duration`、`resample`） |
 | `software/src/model/kinematics.py` | placo FK/IK（含正则项），采集时做 EE 转换 |
 | `software/src/robots/so100_follower/robot_kinematic_processor.py` | `EEReferenceAndDelta` / `InverseKinematicsEEToJoints` 等处理器 |
@@ -137,7 +137,7 @@ git config http.proxy http://127.0.0.1:7890        # 不需要时: git config --
 3. **机器人侧**：
    - 安装 `openpi_client`；按映射表拷贝文件进 lerobot；
    - 按实际硬件修改 `config_xlerobot.py`（相机设备、串口、bus 命名、`use_degrees`）；
-   - 修改 `9_pi05_inference_dualarm.py:69` 的 `OPENPI_SERVER_IP`。
+   - 修改 `9_pi05_inference_dualarm.py` 的 `OPENPI_SERVER_IP` 与 `OPENPI_SERVER_PORT`（SSH 头跑时 `^` 失效、`Ctrl+C` 停止）。
 4. **联调验收**：
    - 服务端 8000 可连通；策略返回 12 维 action chunk；
    - 急停键 `^` 生效；episode 间插值回位正常；50Hz 执行无明显卡顿；

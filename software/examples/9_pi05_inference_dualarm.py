@@ -67,6 +67,7 @@ FPS = 50
 NUM_EPISODES = 2
 EPISODE_TIME_SEC = 600
 OPENPI_SERVER_IP = "xxx.xxx.x.xx" # ip address of the server that provides pi05 inference as service
+OPENPI_SERVER_PORT = 20721  # port of the openpi policy server (upstream serve_policy default is 8000; this deployment uses 20721)
 
 class SimpleArmControl:
     """
@@ -356,16 +357,25 @@ def main():
     print("="*50)
 
     robot = None
+    joint_ipol = None
     robot_name = "xlerobot"
     try:
         robot_config = XLerobotConfig(id=robot_name, use_degrees=True)
         robot = XLerobot(robot_config)
         robot.connect()
 
-        #Init the keyboard instance
-        keyboard_config = KeyboardTeleopConfig()
-        keyboard = KeyboardTeleop(keyboard_config)
-        keyboard.connect()
+        # Init the keyboard instance (optional; unavailable on Linux sessions without DISPLAY)
+        try:
+            keyboard_config = KeyboardTeleopConfig()
+            keyboard = KeyboardTeleop(keyboard_config)
+            keyboard.connect()
+        except Exception as e:
+            print(f"[INIT] Keyboard setup failed: {e}")
+            keyboard = None
+        if keyboard is not None and not keyboard.is_connected:
+            keyboard = None
+        if keyboard is None:
+            print("⚠️ Keyboard unavailable (no DISPLAY?). '^' emergency stop disabled; use Ctrl+C to stop.")
 
         print(f"[INIT] Successfully connected to robot")
         if robot.is_calibrated:
@@ -395,7 +405,7 @@ def main():
         joint_ipol.execute_plan(robot, left_arm, right_arm)
         print("✅ Robot in start pose")
 
-        client = websocket_client_policy.WebsocketClientPolicy(host=OPENPI_SERVER_IP, port=8000)
+        client = websocket_client_policy.WebsocketClientPolicy(host=OPENPI_SERVER_IP, port=OPENPI_SERVER_PORT)
         action_horizon =50
 
         # Initiailize events
@@ -413,10 +423,11 @@ def main():
             print(f"✅ Start episode: {inference_episodes}")
             
             while timestamp < EPISODE_TIME_SEC:
-                pressed_keys = set(keyboard.get_action().keys())
-                if '^' in pressed_keys:
-                    events["stop_inference"] = True
-                    break
+                if keyboard is not None:
+                    pressed_keys = set(keyboard.get_action().keys())
+                    if '^' in pressed_keys:
+                        events["stop_inference"] = True
+                        break
 
                 left_obs = robot.bus1.sync_read("Present_Position", robot.left_arm_motors)
                 right_obs = robot.bus2.sync_read("Present_Position", robot.right_arm_motors)
@@ -477,16 +488,21 @@ def main():
             print(f"🚀 Finished episode: {inference_episodes}")
             inference_episodes += 1
         
+    except KeyboardInterrupt:
+        print("⛔ Interrupted (Ctrl+C); returning to home pose and disconnecting...")
     except Exception as e:
         print(f"Program execution failed: {e}")
         traceback.print_exc()
         
     finally:
-        # Cleanup
+        # Cleanup: always release torque, even if homing is interrupted (Ctrl+C again)
         if robot:
-            joint_ipol.plan_to_target(robot, left_arm, right_arm, ctrl_freq=200)
-            joint_ipol.execute_plan(robot, left_arm, right_arm)
-            robot.disconnect()
+            try:
+                if joint_ipol is not None:
+                    joint_ipol.plan_to_target(robot, left_arm, right_arm, ctrl_freq=200)
+                    joint_ipol.execute_plan(robot, left_arm, right_arm)
+            finally:
+                robot.disconnect()
 
 if __name__ == "__main__":
     main()
