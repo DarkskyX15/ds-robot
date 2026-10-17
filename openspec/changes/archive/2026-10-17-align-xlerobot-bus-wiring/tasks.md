@@ -15,15 +15,15 @@
 
 ## 3. On-robot hardware verification (motors powered, wheels off ground)
 
-- [ ] 3.1 Deploy: pull `feat/pi05-async-inference` on the robot machine, re-copy the driver files into the lerobot install, confirm `port1`/`port2` values point at `/dev/xlerobot_port1` / `/dev/xlerobot_port2`. Verify: robot-env import test passes and a logger output during `connect()` shows both buses opening.
-- [ ] 3.2 Pre-movement bus-role check with torque not yet enabled: read `Present_Position` of `left_arm_shoulder_pan` + `head_motor_1` via bus1 and `right_arm_shoulder_pan` + one wheel via bus2; confirm all expected IDs respond and cross-bus reads fail. Verify: read values are sane (not errors) and no motor moves during the check.
-- [ ] 3.3 Calibration: either restore a seller-format calibration file (keys now match) or run a fresh calibration (bus1: left arm + head; bus2: right arm + wheels with full-range wheels). Verify: calibration file contains all 17 motors, `connect()` restores without warnings, `is_calibrated` is true.
-- [ ] 3.4 Routing safety check per spec: send a small head position command and confirm only head servos move and wheels stay still; send a small base velocity and confirm only wheels move and head stays still; send a small arm target and confirm only that arm moves. Verify: observed motion matches expectations with no cross-group movement.
+- [x] 3.1 Deploy: pull `feat/pi05-async-inference` on the robot machine, re-copy the driver files into the lerobot install, confirm `port1`/`port2` values point at `/dev/xlerobot_port1` / `/dev/xlerobot_port2`. Verify: robot-env import test passes and a logger output during `connect()` shows both buses opening.
+- [x] 3.2 Pre-movement bus-role check with torque not yet enabled: read `Present_Position` of `left_arm_shoulder_pan` + `head_motor_1` via bus1 and `right_arm_shoulder_pan` + one wheel via bus2; confirm all expected IDs respond and cross-bus reads fail. Verify: read values are sane (not errors) and no motor moves during the check.
+- [x] 3.3 Calibration: either restore a seller-format calibration file (keys now match) or run a fresh calibration (bus1: left arm + head; bus2: right arm + wheels with full-range wheels). Verify: calibration file contains all 17 motors, `connect()` restores without warnings, `is_calibrated` is true.
+- [x] 3.4 Routing safety check per spec: send a small head position command and confirm only head servos move and wheels stay still; send a small base velocity and confirm only wheels move and head stays still; send a small arm target and confirm only that arm moves. Verify: observed motion matches expectations with no cross-group movement.
 
 ## 4. Integration acceptance
 
-- [ ] 4.1 Run `9_pi05_inference_dualarm.py` end-to-end against the openpi server (`10.10.64.57:20721`): both arms interpolate to `FULL_START_POS`, observation/action chunks stream at the expected cadence, `^` emergency stop works. Verify: at least one full episode chunk cycle completes and stop works.
-- [ ] 4.2 Smoke-test `8_vr_teleop_with_dataset_recording_dualarm.py` far enough to confirm it reads both arms and connects cameras (VR headset optional), then exit cleanly. Verify: no attribute/connection errors during init and a short manual read.
+- [x] 4.1 Run `9_pi05_inference_dualarm.py` end-to-end against the openpi server (`10.10.64.57:20721`): both arms interpolate to `FULL_START_POS`, observation/action chunks stream at the expected cadence, `^` emergency stop works. Verify: at least one full episode chunk cycle completes and stop works.
+- [x] 4.2 Smoke-test `8_vr_teleop_with_dataset_recording_dualarm.py` far enough to confirm it reads both arms and connects cameras (VR headset optional), then exit cleanly. Verify: no attribute/connection errors during init and a short manual read.
 
 ## Workflow follow-up
 

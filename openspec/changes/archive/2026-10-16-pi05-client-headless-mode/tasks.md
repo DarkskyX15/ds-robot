@@ -13,8 +13,8 @@
 
 ## 3. On-robot verification (after `git pull` on the robot machine)
 
-- [ ] 3.1 SSH (no DISPLAY) headless run: start the example; confirm the keyboard-unavailable warning prints once, the loop proceeds into inference (observations/actions flow), and pressing `Ctrl+C` prints the interruption message, homes the arms, disconnects the robot, and shows no `KeyboardInterrupt` traceback. Verify: observed console output matches; robot ends free (torque off).
-- [ ] 3.2 Desktop session run: start the example with a usable keyboard; confirm no warning is printed, `^` still stops the episode, and the arms home and the robot disconnects as before. Verify: observed console output and motion match previous behavior.
+- [x] 3.1 SSH (no DISPLAY) headless run: start the example; confirm the keyboard-unavailable warning prints once, the loop proceeds into inference (observations/actions flow), and pressing `Ctrl+C` prints the interruption message, homes the arms, disconnects the robot, and shows no `KeyboardInterrupt` traceback. Verify: observed console output matches; robot ends free (torque off).
+- [x] 3.2 Desktop session run: start the example with a usable keyboard; confirm no warning is printed, `^` still stops the episode, and the arms home and the robot disconnects as before. Verify: observed console output and motion match previous behavior.
 
 ## Workflow follow-up
 
